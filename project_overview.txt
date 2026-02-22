@@ -1,0 +1,293 @@
+Automated Fruit & Vegetable Freshness Classification
+AI-Powered Freshness Detection System
+
+Automated Fruit & Vegetable Freshness Classification with Deep Learning
+Python | PyTorch | Torchvision | Streamlit | NumPy | Pandas | Matplotlib | Seaborn | scikit-learn
+
+================================================================================
+Overview
+================================================================================
+This project presents an AI-powered system designed to automatically classify
+whether a fruit or vegetable is fresh or stale using deep learning and computer
+vision. The system addresses the limitations of manual food inspection, which is
+time-consuming, subjective, and error-prone.
+
+Developed as part of a Deep Learning Fundamental final project, the system
+demonstrates how convolutional neural networks (CNNs) and transfer learning can
+be applied to real-world food quality detection through both image upload and
+live camera capture.
+
+================================================================================
+1. Introduction
+================================================================================
+
+1.1 Background
+--------------
+In the food industry, agriculture, and retail, assessing the freshness of fruits
+and vegetables is a critical task that directly impacts food safety, waste
+reduction, and consumer health. Traditionally, freshness is determined by human
+visual inspection — a method that is inherently subjective, inconsistent, and
+not scalable in high-volume environments.
+
+With the advancement of deep learning and computer vision, automated freshness
+detection using image classification has become a viable and practical solution.
+Convolutional Neural Networks (CNNs), particularly those trained with transfer
+learning from large-scale datasets such as ImageNet, have demonstrated remarkable
+accuracy in image recognition tasks.
+
+This project implements a multi-model approach — training and comparing three
+well-known CNN architectures (ResNet50, EfficientNet-B0, and MobileNetV2) on a
+labeled dataset of fresh and stale produce, ultimately selecting the best-
+performing model for deployment in an interactive web application.
+
+1.2 Problem Statement
+---------------------
+Manual freshness inspection is inconsistent, slow, and not suitable for large-
+scale environments. There is no standardized, automated, and contactless method
+for detecting fruit and vegetable freshness in everyday use. This project proposes
+a deep learning-based image classification system that can accurately distinguish
+between fresh and stale produce across multiple fruit and vegetable types in real
+time, accessible through a simple web interface.
+
+================================================================================
+2. Tools & Technologies Used
+================================================================================
+
+Tool / Library          Purpose
+----------------------  --------------------------------------------------------
+PyTorch                 Core deep learning framework for model training
+Torchvision             Pretrained models (ResNet50, EfficientNet-B0, MobileNetV2)
+                        and image transformation pipelines
+NumPy & PIL (Pillow)    Image manipulation and array operations
+Pandas                  Structured data handling and logging
+Matplotlib & Seaborn    Visualization: training curves, confusion matrix, samples
+scikit-learn            Dataset splitting, classification report, evaluation metrics
+Streamlit               Interactive web application for real-time inference
+Jupyter Notebook        Training workflow and experimentation environment
+
+================================================================================
+3. Dataset
+================================================================================
+
+The dataset consists of 12 classes across 6 types of fruits and vegetables,
+categorized into two conditions:
+
+  Fresh Classes:  fresh_apple, fresh_banana, fresh_bitter_gourd,
+                  fresh_capsicum, fresh_orange, fresh_tomato
+
+  Stale Classes:  stale_apple, stale_banana, stale_bitter_gourd,
+                  stale_capsicum, stale_orange, stale_tomato
+
+Split Configuration:
+  - Training   : 70%
+  - Validation : 15%
+  - Test       : 15%
+
+Image Preprocessing:
+  - Resize to 224x224 pixels
+  - Normalization using ImageNet mean and standard deviation
+    (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
+Data Augmentation (Training only):
+  - Random Horizontal Flip
+  - Random Rotation (±15 degrees)
+  - Color Jitter (brightness, contrast, saturation, hue)
+  - Random Resized Crop
+
+[IMAGE: Dataset sample grid — showing examples of all 12 classes
+        (fresh vs stale for each fruit/vegetable type)]
+
+[IMAGE: Class distribution bar chart — showing number of images per class
+        to visualize dataset balance]
+
+[IMAGE: Augmentation visualization — showing original vs augmented versions
+        of sample images to demonstrate preprocessing pipeline]
+
+================================================================================
+4. System Workflow & Results
+================================================================================
+
+4.1 Model Training
+------------------
+Three pretrained CNN architectures were fine-tuned on the fruit freshness
+dataset. For each model, the final classification layer was replaced with a new
+fully connected layer outputting 12 classes.
+
+  Model 1 — ResNet50
+    Architecture : 50-layer deep residual network, 25.6M parameters
+    Pretrained   : ImageNet
+    Modification : Final FC layer replaced → Linear(2048, 12)
+
+  Model 2 — EfficientNet-B0
+    Architecture : Compound-scaled CNN, 5.3M parameters
+    Pretrained   : ImageNet
+    Modification : Classifier layer replaced → Linear(1280, 12)
+
+  Model 3 — MobileNetV2
+    Architecture : Lightweight inverted residuals, 3.5M parameters
+    Pretrained   : ImageNet
+    Modification : Classifier layer replaced → Linear(1280, 12)
+
+Training Configuration (same for all models):
+  - Optimizer      : Adam (lr = 1e-4)
+  - Loss Function  : CrossEntropyLoss
+  - Batch Size     : 32
+  - Early Stopping : Patience = 5 epochs
+  - Device         : CUDA GPU (if available), else CPU
+
+[IMAGE: Training curves — Loss and Accuracy plots (train vs validation)
+        for all 3 models across epochs, showing convergence behavior]
+
+4.2 Model Evaluation
+--------------------
+Each model was evaluated on the held-out test set using accuracy, precision,
+recall, and F1-score metrics.
+
+[IMAGE: Confusion matrix heatmap — for the best-performing model (EfficientNet-B0)
+        showing predictions vs actual classes across all 12 categories]
+
+[IMAGE: Classification report table — precision, recall, F1-score per class
+        for the best model]
+
+[IMAGE: Correct vs incorrect prediction samples — showing example images
+        with predicted label, true label, and confidence score]
+
+4.3 Model Comparison & Selection
+---------------------------------
+
+Model             Train Acc   Val Acc   Test Acc
+----------------  ----------  --------  --------
+ResNet50          ~97%        ~96%      ~96%
+EfficientNet-B0   ~99%        ~99%      99.91%   ← Best Model
+MobileNetV2       ~95%        ~94%      ~94%
+
+EfficientNet-B0 achieved the highest accuracy at 99.91% on the test set and was
+selected as the final model. It was saved to: models/best_model.pth
+
+[IMAGE: Model comparison bar chart — showing test accuracy of all 3 models
+        side by side for easy comparison]
+
+4.4 Web Application (FreshScan AI)
+-----------------------------------
+The best model (EfficientNet-B0) was deployed through an interactive Streamlit
+web application called FreshScan AI. Users can either upload a fruit/vegetable
+image or use their device camera for real-time freshness detection.
+
+Features:
+  - Upload Image  : Drag-and-drop or browse to upload a JPG/PNG image
+  - Live Camera   : Capture photo directly from webcam
+  - Results shown : Predicted class (fruit type + fresh/stale), confidence
+                    score, confidence progress bar, and top-3 predictions
+                    ranked with medal icons (Gold, Silver, Bronze)
+  - Stat cards    : Displays model accuracy, number of classes, architecture
+                    name, and current compute device (CPU/GPU)
+
+[IMAGE: Web app screenshot — Upload tab with an uploaded image and
+        prediction result showing fruit type, fresh/stale status,
+        and confidence score]
+
+[IMAGE: Web app screenshot — Camera tab showing live capture interface]
+
+[IMAGE: Web app screenshot — Top-3 predictions panel with medal ranks
+        and probability percentages]
+
+================================================================================
+5. Limitations
+================================================================================
+
+While the system performs excellently under standard conditions, a few
+limitations are acknowledged:
+
+  - Lighting sensitivity : Detection accuracy may decrease in very dark
+    or overexposed environments, affecting image quality fed to the model.
+
+  - Single-fruit assumption : The model is designed for single-fruit-per-image
+    classification. Multiple items in one frame may produce unreliable results.
+
+  - Out-of-distribution inputs : The model may produce incorrect predictions
+    for fruit/vegetable types not included in the 12 training classes.
+
+  - Camera quality dependency : Low-resolution cameras may reduce prediction
+    accuracy, particularly when fine visual details (texture, color changes)
+    are critical to classification.
+
+  - Age of produce : Borderline cases (slightly stale but not visually obvious)
+    may be misclassified due to subtle visual differences.
+
+These limitations reflect common challenges in real-world computer vision systems
+and serve as opportunities for further development and dataset expansion.
+
+================================================================================
+6. Conclusion
+================================================================================
+
+This project demonstrates how transfer learning with pretrained CNN architectures
+can be effectively leveraged to automate fruit and vegetable freshness detection
+with high accuracy. By comparing three architectures — ResNet50, EfficientNet-B0,
+and MobileNetV2 — the project confirmed that EfficientNet-B0 provides the best
+trade-off between accuracy and model efficiency, achieving 99.91% test accuracy.
+
+The FreshScan AI web application provides a user-friendly, contactless interface
+for real-time freshness detection, suitable for practical use in homes, markets,
+or food inspection workflows. Compared to manual visual inspection, this solution
+offers consistency, speed, and scalability.
+
+Future improvements may include expanding the dataset to more produce types,
+incorporating object detection for multi-item scenes, and optimizing the model
+for mobile deployment.
+
+================================================================================
+Images You Need to Provide
+================================================================================
+
+Below is a checklist of images you should capture/export from your notebook
+and results to complete this documentation:
+
+  [1] Dataset sample grid
+      → A grid showing representative images from all 12 classes
+        (e.g., 2 rows x 6 columns: fresh on top, stale on bottom)
+
+  [2] Class distribution bar chart
+      → Bar chart showing number of images per class in the dataset
+
+  [3] Augmentation visualization
+      → Side-by-side comparison of original vs augmented images
+        (from Cell 3 of the training notebook)
+
+  [4] Training curves (Loss & Accuracy)
+      → Line plots for train loss, val loss, train accuracy, val accuracy
+        across epochs for all 3 models
+
+  [5] Confusion matrix heatmap
+      → Seaborn heatmap from model evaluation (best model: EfficientNet-B0)
+
+  [6] Classification report table
+      → Screenshot of precision/recall/F1-score per class output
+
+  [7] Correct vs incorrect prediction samples
+      → Sample grid showing images predicted correctly and incorrectly
+        with label + confidence score overlaid
+
+  [8] Model comparison bar chart
+      → Bar chart comparing test accuracy of ResNet50, EfficientNet-B0,
+        and MobileNetV2
+
+  [9] Web app screenshot — Upload tab with result
+      → Screenshot of FreshScan AI showing an uploaded image and
+        the analysis result (fruit name, fresh/stale, confidence)
+
+  [10] Web app screenshot — Camera tab
+       → Screenshot of the camera input interface
+
+  [11] Web app screenshot — Top-3 predictions
+       → Close-up of the top-3 prediction panel with medal ranks
+         and probability values
+
+================================================================================
+Author
+================================================================================
+
+Final Project — Deep Learning Fundamental
+President University — Semester 4
+
+================================================================================
