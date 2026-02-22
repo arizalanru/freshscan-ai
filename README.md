@@ -109,7 +109,7 @@ The model is trained on **12 classes** (6 items × 2 conditions):
 
 ## Author
 
-**Final Project — Deep Learning Fundamental**  
-*President University — Semester 4*
+**ArizAL Anru - Final Project - Deep Learning Fundamental**  
+*President University*
 
 ---
